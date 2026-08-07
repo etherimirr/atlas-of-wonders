@@ -223,7 +223,7 @@ body.photos #zphoto{background:#171b28;color:var(--gold2);border-color:#4a4636}
 #zoomctl button{width:38px;height:38px;border-radius:10px;border:1px solid #2a3040;background:#0f121bb0;color:var(--gold2);
   font-size:16px;cursor:pointer;backdrop-filter:blur(10px);transition:.25s;font-family:var(--display)}
 #zoomctl button:hover{background:#171b28;border-color:#4a4636;color:#f0e5cc}
-#zoomctl #zusa,#zoomctl #zworld,#zoomctl #zroute,#zoomctl #zphoto{font-size:15px}
+#zoomctl #zroute{font-size:15px}
 
 #hint{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);color:#aab8e0cc;font-size:12px;z-index:3;
   letter-spacing:1px;background:#0a1030aa;padding:5px 14px;border-radius:999px;border:1px solid #24305e;backdrop-filter:blur(6px);white-space:nowrap}
@@ -530,10 +530,7 @@ body.view-diary #stage,body.view-diary #filters{display:none}
     <div id="zoomctl">
       <button id="zin" title="放大">＋</button>
       <button id="zout" title="缩小">－</button>
-      <button id="zusa" title="美国">美</button>
-      <button id="zworld" title="全球">界</button>
       <button id="zroute" title="路线 · 依次轻触地点，串成旅程">径</button>
-      <button id="zphoto" title="城市代表照">影</button>
     </div>
 
     <div id="routebar">
@@ -712,10 +709,10 @@ svg.addEventListener('touchmove',e=>{
   else if(e.touches.length===1&&!pinch){move(e.touches[0].clientX,e.touches[0].clientY);}
 },{passive:false});
 svg.addEventListener('touchend',e=>{if(e.touches.length===0){up();pinch=null;}else if(e.touches.length===1){pinch=null;down(e.touches[0].clientX,e.touches[0].clientY);}});
-$('#zin').onclick=()=>{view.k=Math.min(1000,view.k*1.4);apply();};
-$('#zout').onclick=()=>{view.k=Math.max(0.8,view.k/1.4);apply();};
-$('#zusa').onclick=()=>{pushView();animateTo(usBox,.14);};
-$('#zworld').onclick=()=>{pushView();animateTo({x0:0,y0:0,x1:W,y1:H},0);};
+function zoomBy(f){const cx=W/2,cy=H/2;const mx=(cx-view.x)/view.k,my=(cy-view.y)/view.k;
+  view.k=Math.max(0.8,Math.min(1000,view.k*f));view.x=cx-mx*view.k;view.y=cy-my*view.k;apply();}
+$('#zin').onclick=()=>zoomBy(1.4);
+$('#zout').onclick=()=>zoomBy(1/1.4);
 $('#compass').onclick=()=>{pushView();animateTo(usBox,.2);};
 
 // ── route mode: click places 先来后到 to chain a journey ──
@@ -736,7 +733,7 @@ function toggleTripPin(id){const i=trip.indexOf(id);
   saveTrip();drawTrip();}
 function setRouteMode(on){routeMode=on;document.body.classList.toggle('route-mode',on);
   $('#hint').style.opacity=on?0:1;}
-$('#zphoto').onclick=()=>{document.body.classList.toggle('photos');apply();};
+const _zp=$('#zphoto');if(_zp)_zp.onclick=()=>{document.body.classList.toggle('photos');apply();};
 $('#zroute').onclick=()=>setRouteMode(!routeMode);
 $('#routedone').onclick=()=>setRouteMode(false);
 $('#routeclear').onclick=()=>{trip=[];saveTrip();drawTrip();};
